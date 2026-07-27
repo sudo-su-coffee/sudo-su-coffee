@@ -1,6 +1,6 @@
 # sudo-su-coffee
 
-> **AI-native infrastructure software written from first principles.**
+> **Infrastructure software written from first principles.**
 
 ## Why this organisation exists
 
