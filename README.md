@@ -1,109 +1,52 @@
 # sudo-su-coffee
 
-> **Infrastructure software written from first principles.**
+**Infrastructure software, built from scratch.**
 
-## Why this organisation exists
+## Why This Organisation Exists
 
-Modern infrastructure is built by composing hundreds of third-party libraries.
+Modern infrastructure is built by stacking hundreds of third-party libraries on top of each other. Every dependency is another codebase you didn't write, another API you don't control, another security surface, another release cycle, another thing that can break underneath you.
 
-Every dependency introduces another codebase, another API, another security surface, another release cycle, and another layer that both humans and AI systems must understand.
+**We don't do that here.**
 
-Our philosophy is different.
+We build infrastructure software from first principles, in pure Zig, Go, and Rust — no wrappers, no bindings to someone else's C library, no framework doing the real work behind the scenes. If it's core to the stack, we write it ourselves.
 
-We build infrastructure software from first principles using **pure Zig**, **Go**, and **Rust**, with a strong preference for:
+Preferences, in order:
+- own the implementation
+- zero runtime dependencies
+- zero C libraries wherever practical
+- portable single binaries
+- predictable memory usage
+- readable source, no cleverness for its own sake
+- embeddable as a library, not just a daemon
+- built to still make sense in ten years
 
-* owning the implementation
-* zero runtime dependencies
-* zero C libraries whenever practical
-* portable single binaries
-* predictable memory usage
-* readable source code
-* embeddable libraries
-* long-term maintainability
-
-The goal is not to reinvent software for the sake of it.
-
-The goal is to create infrastructure that is easy to understand, easy to modify, and easy for both humans and AI systems to reason about.
+The point isn't reinventing things for sport. The point is that every piece of this stack is something we can fully read, fully modify, and fully trust — because we wrote it.
 
 ---
 
-# Design Principles
+## Design Principles
 
-Every project follows the same engineering philosophy.
+### Own the implementation
 
-## Own the implementation
+QR encoding, CSV parsing, hash tables, storage engines, network protocols, schedulers — we write the algorithm, not wrap someone else's library for it. That means full understanding of the code, a consistent style across the whole stack, easier debugging, and no supply-chain risk from a dependency we don't control.
 
-Whenever practical we implement algorithms ourselves rather than wrapping existing C libraries.
+### Zero external runtime dependencies
 
-Examples include:
+Every project should compile to a single executable. No package manager pulling things in at runtime, no plugins fetched from somewhere else, no hidden service required just to boot.
 
-* QR encoding
-* CSV parsing
-* hash tables
-* storage engines
-* network protocols
-* schedulers
+### Performance through simplicity
 
-This provides:
+Cache-friendly layouts, minimal allocations, predictable memory — not abstraction for abstraction's sake. Benchmarks only get published when they're reproducible. No marketing numbers.
 
-* complete understanding of the code
-* consistent coding style
-* easier optimisation
-* easier debugging
-* fewer supply-chain risks
+### Build primitives, not frameworks
 
----
-
-## Zero external runtime dependencies
-
-Projects should compile into a single executable whenever possible.
-
-No runtime package managers.
-
-No dynamically downloaded plugins.
-
-No hidden services required for operation.
-
----
-
-## AI-first codebases
-
-Large language models perform better when the entire system shares one architecture and one coding style.
-
-Instead of understanding hundreds of unrelated libraries, an AI assistant can understand the complete stack because every component follows the same principles.
-
-This makes maintenance, code generation, debugging and optimisation significantly easier.
-
----
-
-## Performance through simplicity
-
-Performance is achieved through:
-
-* cache-friendly data structures
-* minimal allocations
-* predictable memory layouts
-* avoiding unnecessary abstractions
-* measuring before optimising
-
-Benchmarks are published only when reproducible.
-
-No synthetic marketing numbers.
-
----
-
-## Build primitives, not frameworks
-
-Small focused tools compose into larger systems.
+Small, focused tools that compose. Every piece works standalone.
 
 ```
 Applications
         │
         ▼
- zigweb
- zigqueue
- zigsearch
- zigsmtp
+ zigweb ─ zigqueue ─ zigsearch ─ zigsmtp
         │
         ▼
       zigkv
@@ -113,145 +56,88 @@ Applications
 zigwal    zigobj
 ```
 
-Every component should be usable independently.
+---
+
+## Repositories (39)
+
+### Shipped — has working code
+
+| Project | What it is |
+|---|---|
+| **zigqr** | QR/barcode generator, own encoding algorithm, no C lib |
+| **zigdiff** | Semantic JSON diff — structural comparison, config-drift detection |
+| **zigcron** | Embeddable scheduler and lightweight CLI daemon |
+| **zigcsv** | Zero-allocation CSV/TSV toolkit — measured faster and far lighter on memory than Pandas on tested datasets |
+| **zigkv** | In-memory key-value store, pure Zig, Redis-compatible, zero deps, single binary |
+| **dispatchd-go** | Order-rider matching daemon |
+| **etaz-go** | ETA estimator |
+| **nammapush-rs** | gRPC-based push-notification service, 100k+ persistent streams (rewrite target: `zigpush`) |
+| **zigzvm** | One script, any Zig version, instant switching |
+
+### In progress — repo live, building it out
+
+| Project | What it is |
+|---|---|
+| **zigobj** | S3-compatible object storage daemon, content-addressed, protocol-compatible not spec-complete |
+| **zigauth** | Identity/token issuance, claims-based, zero-dependency |
+| **zigvault** | Encrypted-at-rest environment/secrets access, zero-auth friction |
+| **zigriskguard** | Gig-platform fraud/abuse checks |
+| **zigpush** | Ultra-optimized push notifications, pure Zig (rewrite of `nammapush-rs`) |
+| **zigsmtp** | Full email system, own SMTP implementation |
+| **zigrepl** | Raft-based replication daemon for multi-node KV/WAL |
+| **zigmq** | Lightweight pub/sub broker — NATS alternative |
+| **ziggeoidx** | Hand-written geospatial index, own geohash/grid algorithm, no H3/S2 |
+| **zigriskgate** | Pre-dispatch risk check gate, rule-based, sub-ms, GC-free |
+| **zigwebhookd** | Webhook relay |
+| **zigqueue** | Durable job queue |
+| **zigsearch** | BM25 full-text search engine |
+| **zigmetric** | Metrics collection/aggregation, Prometheus-style |
+| **ziglog** | Structured logging daemon |
+| **ziggeofence** | Geofence event engine — enter/exit events off position streams |
+| **zigtick** | Append-only columnar store for market tick data |
+| **zigledger** | Immutable double-entry accounting ledger |
+| **zigbook** | Deterministic order-book matching engine |
+| **zigcert** | Minimal ACME/Let's Encrypt client — certbot alternative |
+| **ziglock** | Distributed lock service — etcd alternative |
+| **zigshot** | Copy-on-write snapshot tool |
+| **zigdns** | DNS server, load-balance by DNS |
+| **zigweb** | HTTP reverse proxy + load balancing |
 
 ---
 
-# Current Projects
+## Language Strategy
 
-## Zig
-
-### Core
-
-* zigcsv
-* zigqr
-* zigdiff
-* zigcron
-* zigkv
-* zigwal
-* zigqueue
-* zigsearch
-* zigweb
-* zigtls
-* zigmux
-* zigdns
-* zigmetric
-* ziglog
-* zigcert
-* zigbalance
-* ziglock
-* zigwebhookd
-
-### Data & Storage
-
-* zigobj
-* zigshot
-
-### Fintech
-
-* zigledger
-* zigbook
-* zigtick
-
-### Logistics
-
-* ziggeofence
-* ziggeoidx
+| Language | Role |
+|---|---|
+| **Zig** | Primary — infra, fintech, logistics, security. Bulk of the stack. |
+| **Go** | Kept for `dispatchd-go` / `etaz-go` — concurrency and stdlib patterns. |
+| **Rust** | `nammapush-rs` being phased out, rewritten in pure Zig as `zigpush`. |
 
 ---
 
-## Go
+## Benchmarks
 
-Focused on distributed systems, orchestration and business services.
+Performance claims are backed by reproducible benchmarks only.
 
-* dispatchd-go
-* etaz-go
-* authd-go
-* tripstate-go
-* driftctl-lite-go
-* envsafe-go
-* gitstatd-go
-* sqlreplay-go
-* logshape-go
-* riskguard-go
+Currently published: `zigcsv` shows significantly lower memory usage than Pandas during CSV processing, with substantially higher read throughput on tested datasets.
+
+Methodology, datasets, and commands are published alongside each project. No numbers without a reproducible procedure behind them.
 
 ---
 
-## Rust
+## Long-Term Vision
 
-Reserved for workloads where the ecosystem or deterministic latency provides a clear advantage.
+Not one big framework — a full set of infrastructure primitives, each standalone, each composable:
 
-* nammapush-rs
-* riskgate-rs
-* parqtail-rs
+key-value storage, object storage, queues, search, logging, metrics, replication, networking, scheduling, identity, messaging.
 
----
-
-# Current Status
-
-Several projects are already operational and publicly available.
-
-Examples include:
-
-* zigcsv
-* zigqr
-* zigdiff
-* zigcron
-* nammapush-rs
-
-Additional repositories are currently under active development.
+`zigkv` is the anchor piece — everything above it in the stack (`zigweb`, `zigqueue`, `zigsearch`, `zigsmtp`) builds on it without pulling in a third-party runtime underneath.
 
 ---
 
-# Benchmarks
-
-Performance claims are backed by reproducible benchmarks.
-
-Current observations include:
-
-* **zigcsv** demonstrates significantly lower memory usage than Pandas during CSV processing.
-* Internal benchmarking also shows substantially higher CSV read throughput on tested datasets.
-
-Benchmark methodology, datasets and commands are published alongside each project.
-
-No benchmark numbers are presented without reproducible test procedures.
-
----
-
-# Long-Term Vision
-
-Rather than creating one large framework, this organisation aims to build a complete collection of infrastructure primitives.
-
-Examples include:
-
-* key-value storage
-* object storage
-* queues
-* search
-* logging
-* metrics
-* replication
-* networking
-* scheduling
-* identity
-* messaging
-
-Each project is designed to work independently while integrating naturally with the rest of the ecosystem.
-
----
-
-# Philosophy
+## Philosophy
 
 Infrastructure should be:
+understandable, observable, portable, dependency-light, predictable, benchmarked, production-focused.
 
-* understandable
-* observable
-* portable
-* dependency-light
-* predictable
-* benchmarked
-* production focused
-
-The objective is not to replace every existing project.
-
-The objective is to build software that engineers can fully understand, confidently modify, and rely upon for the next decade.
+We're not trying to replace every existing project out there. We're trying to build software that we — and anyone else who picks it up — can fully understand, confidently modify, and rely on for the next decade.
