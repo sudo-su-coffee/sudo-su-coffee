@@ -1,4 +1,4 @@
-## Hi, I'm Jana 👋 · a.k.a. `dactilvey` in dev
+## Hi, I'm Jana 👋 · a.k.a. `actilvey` in dev
 
 > "I was interested in doing it, there was an opportunity, so I just did it." — Barbara Liskov
 
